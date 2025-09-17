@@ -14,8 +14,8 @@ model User {
   username   String
   avatar     String
 
-  conversationId Int
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversationId Int?
+  conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   messages       Message[]
 
   createdAt DateTime @default(now())
