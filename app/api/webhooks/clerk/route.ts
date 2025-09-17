@@ -11,10 +11,10 @@ export async function POST(req: NextRequest) {
     const user = evt.data as UserJSON;
 
     const id = user.id;
-    const username = user.username ?? user.email_addresses[0].email_address;
+
     const avatar = user.image_url;
     const email = user.email_addresses?.[0]?.email_address;
-
+    const username = user.username ?? email;
     if (eventType === "user.created") {
       await db.user.create({
         data: {
