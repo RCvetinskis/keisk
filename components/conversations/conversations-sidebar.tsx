@@ -1,7 +1,14 @@
 import { Conversation as PrismaConversation } from "@prisma/client";
 import Conversation from "./conersation";
 import SearchConversation from "./search-conversation";
-
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
 type Props = {};
 
 export const mockConversations: PrismaConversation[] = [
@@ -17,21 +24,26 @@ export const mockConversations: PrismaConversation[] = [
     createdAt: new Date("2025-09-01T00:00:00.000Z"),
     updatedAt: new Date("2025-09-02T00:00:00.000Z"),
   },
-
 ];
 const ConversationsSideBar = () => {
   return (
-    <div className="shadow p-1 h-full overflow-x-auto">
-      <header>
-        <SearchConversation />
-      </header>
+    <Sidebar side="right">
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarHeader>
+            <SearchConversation />
+          </SidebarHeader>
 
-      <main>
-        {mockConversations.map((conversation) => (
-          <Conversation key={conversation.id} conversation={conversation} />
-        ))}
-      </main>
-    </div>
+          <SidebarMenu>
+            {mockConversations.map((item) => (
+              <SidebarMenuItem key={item.id}>
+                <Conversation conversation={item} />
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
   );
 };
 

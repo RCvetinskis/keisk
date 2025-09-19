@@ -14,7 +14,7 @@ const Conversation = ({ conversation }: Props) => {
 
   const seleceted = Number(params.id) || 1;
   return (
-    <Link href={`${conversation.id}`}>
+    <Link href={`/conversations/${conversation.id}`}>
       <div className={cn("p-2 rounded w-full  hover:cursor-pointer hover:shadow shadow-foreground transition-shadow duration-300", seleceted === conversation.id && 'shadow-lg shadow-foreground')}>
         <div className="flex items-center gap-4 ">
           <UserAvatar />

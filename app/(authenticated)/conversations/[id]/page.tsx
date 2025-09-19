@@ -1,13 +1,12 @@
 import React from "react";
 
 type Props = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
-
 const Page = async ({ params }: Props) => {
-  const { id } = params;
+  const { id } = await params;
 
   return <div>render conversation: {id}</div>;
 };
