@@ -1,27 +1,45 @@
-import { useSidebar } from "@/components/ui/sidebar";
-import { Home, MessageCircle } from "lucide-react";
+import useSheetStore from "@/stores/sheet-stores";
+import { Home, LucideProps, MessageCircle } from "lucide-react";
 import { usePathname } from "next/navigation";
-
+import { useIsMobile } from "./use-mobile";
+import { ForwardRefExoticComponent, RefAttributes } from "react";
+type RouteItem = {
+  title: string;
+  url: string;
+  icon: ForwardRefExoticComponent<
+    Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>
+  >;
+  active: boolean;
+  action?: () => void;
+};
 const useRoutes = () => {
   const path = usePathname();
-  const { toggleSidebar: toggleChatBar } = useSidebar();
-  const routes = [
+  const { toggle } = useSheetStore();
+  const isMobile = useIsMobile();
+
+  const isAuthenticated = true;
+  const authenticatedRoutes = [
+    {
+      title: "Conversations",
+      url: "/conversations",
+      icon: MessageCircle,
+      active: path.includes("/conversations"),
+      action: () => {
+        if (isMobile) {
+          toggle();
+        }
+      },
+    },
+  ];
+  const routes: RouteItem[] = [
     {
       title: "Home",
       url: "/",
       icon: Home,
       active: path === "/",
     },
-
-    {
-      title: "Conversations",
-      url: "/conversations",
-      icon: MessageCircle,
-      active: path.includes("/conversations"),
-      action: () => toggleChatBar(),
-    },
   ];
-  return routes;
+  return isAuthenticated ? [...routes, ...authenticatedRoutes] : routes;
 };
 
 export default useRoutes;

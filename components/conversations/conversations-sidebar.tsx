@@ -1,15 +1,16 @@
+"use client";
 import { Conversation as PrismaConversation } from "@prisma/client";
 import Conversation from "./conersation";
 import SearchConversation from "./search-conversation";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
-type Props = {};
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import useSheetStore from "@/stores/sheet-stores";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const mockConversations: PrismaConversation[] = [
   {
@@ -25,25 +26,43 @@ export const mockConversations: PrismaConversation[] = [
     updatedAt: new Date("2025-09-02T00:00:00.000Z"),
   },
 ];
-const ConversationsSideBar = () => {
-  return (
-    <Sidebar side="right">
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarHeader>
-            <SearchConversation />
-          </SidebarHeader>
 
-          <SidebarMenu>
-            {mockConversations.map((item) => (
-              <SidebarMenuItem key={item.id}>
-                <Conversation conversation={item} />
-              </SidebarMenuItem>
+const ConversationsSideBar = () => {
+  const { isOpen, close } = useSheetStore();
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <Sheet open={isOpen} onOpenChange={(open) => (open ? null : close())}>
+        <SheetContent className="p-2 pt-10">
+          <SheetHeader className="p-0">
+            <SearchConversation />
+            <VisuallyHidden>
+              <SheetTitle>Conversations</SheetTitle>
+            </VisuallyHidden>
+          </SheetHeader>
+
+          <div>
+            {mockConversations.map((conversation) => (
+              <Conversation key={conversation.id} conversation={conversation} />
             ))}
-          </SidebarMenu>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+          </div>
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
+  return (
+    <div className="shadow p-2 h-full overflow-x-auto">
+      <header className="mb-2">
+        <SearchConversation />
+      </header>
+      <div>
+        {mockConversations.map((conversation) => (
+          <Conversation key={conversation.id} conversation={conversation} />
+        ))}
+      </div>
+    </div>
   );
 };
 

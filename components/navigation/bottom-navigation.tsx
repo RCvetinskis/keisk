@@ -1,9 +1,7 @@
 "use client";
-
 import useRoutes from "@/hooks/use-routes";
 import { Button } from "../ui/button";
 import Link from "next/link";
-
 
 type Props = {};
 

@@ -1,17 +1,12 @@
 import ConversationsSideBar from "@/components/conversations/conversations-sidebar";
-import BottomNavigation from "@/components/navigation/bottom-navigation";
-import { SidebarProvider } from "@/components/ui/sidebar";
 
 const AuthenticatedLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div>
-      {children}
-      <SidebarProvider>
+    <div className="flex h-screen">
+      <main className="flex-1">{children}</main>
+      <aside className="w-80 hidden md:block">
         <ConversationsSideBar />
-        <footer className="block md:hidden">
-          <BottomNavigation />
-        </footer>
-      </SidebarProvider>
+      </aside>
     </div>
   );
 };
