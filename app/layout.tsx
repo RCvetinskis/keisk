@@ -2,6 +2,9 @@ import { type Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/navigation/app-sidebar";
+import BottomNavigation from "@/components/navigation/bottom-navigation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +33,17 @@ export default function RootLayout({
           suppressHydrationWarning={true}
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          {children}
+          <SidebarProvider>
+            <AppSidebar />
+
+            <SidebarTrigger className="hidden md:block" />
+            <main className="w-full md:max-w-screen md:mx-auto">
+              {children}
+            </main>
+            <footer className="block md:hidden">
+              <BottomNavigation />
+            </footer>
+          </SidebarProvider>
         </body>
       </html>
     </ClerkProvider>

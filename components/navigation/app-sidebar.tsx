@@ -1,5 +1,4 @@
 "use client";
-import { Home } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -11,20 +10,13 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-
 import { UserButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
-
-const items = [
-  {
-    title: "Home",
-    url: "#",
-    icon: Home,
-  },
-];
+import useRoutes from "@/hooks/use-routes";
 
 export function AppSidebar() {
-  const { user } = useUser();
+  // const { user } = useUser();
+  const routes = useRoutes();
 
   return (
     <Sidebar>
@@ -33,10 +25,19 @@ export function AppSidebar() {
           <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
+              {routes.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link href={item.url}>
+                  <SidebarMenuButton
+                    asChild
+                    variant={item.active ? "selected" : "default"}
+                  >
+                    <Link
+                      href={item.url}
+                      onClick={(e) => {
+                        item.action?.();
+                      }}
+                      className="flex items-center gap-2"
+                    >
                       <item.icon />
                       <span>{item.title}</span>
                     </Link>
