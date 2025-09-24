@@ -1,5 +1,5 @@
 import useSheetStore from "@/stores/sheet-stores";
-import { Home, LucideProps, MessageCircle } from "lucide-react";
+import { Home, LucideProps, MessageCircle, List } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useIsMobile } from "./use-mobile";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
@@ -24,6 +24,17 @@ const useRoutes = () => {
       url: "/conversations",
       icon: MessageCircle,
       active: path.includes("/conversations"),
+      action: () => {
+        if (isMobile) {
+          toggle();
+        }
+      },
+    },
+    {
+      title: "Items",
+      url: "/items",
+      icon: List,
+      active: path.includes("/items"),
       action: () => {
         if (isMobile) {
           toggle();

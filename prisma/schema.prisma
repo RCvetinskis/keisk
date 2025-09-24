@@ -17,6 +17,7 @@ model User {
   conversationId Int?
   conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   messages       Message[]
+  items          Item[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
@@ -47,6 +48,19 @@ model Message {
   parentId Int?
   parent   Message?  @relation("MessageReplies", fields: [parentId], references: [id])
   replies  Message[] @relation("MessageReplies")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model Item {
+  id Int @id @default(autoincrement())
+
+  title       String
+  description String
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
