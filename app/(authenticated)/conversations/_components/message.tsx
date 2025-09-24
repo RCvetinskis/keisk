@@ -6,6 +6,7 @@ type Props = {
 };
 
 const Message = ({ message }: Props) => {
+  // TODO display messages
   return <div>{message.content}</div>;
 };
 

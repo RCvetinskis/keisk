@@ -1,5 +1,5 @@
 "use client";
-import { Conversation as PrismaConversation } from "@prisma/client";
+import { User } from "@prisma/client";
 import Conversation from "./conersation";
 import SearchConversation from "./search-conversation";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
@@ -11,23 +11,13 @@ import {
 } from "@/components/ui/sheet";
 import useSheetStore from "@/stores/sheet-stores";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { ConversationWithUsers } from "@/lib/types";
 
-export const mockConversations: PrismaConversation[] = [
-  {
-    id: 1,
-    name: "Jonas",
-    createdAt: new Date("2025-08-01T00:00:00.000Z"),
-    updatedAt: new Date("2025-08-02T00:00:00.000Z"),
-  },
-  {
-    id: 2,
-    name: "Alice",
-    createdAt: new Date("2025-09-01T00:00:00.000Z"),
-    updatedAt: new Date("2025-09-02T00:00:00.000Z"),
-  },
-];
+type Props = {
+  conversations: Array<ConversationWithUsers | User>;
+};
 
-const ConversationsSideBar = () => {
+const ConversationsSideBar = ({ conversations }: Props) => {
   const { isOpen, close } = useSheetStore();
   const isMobile = useIsMobile();
 
@@ -43,7 +33,7 @@ const ConversationsSideBar = () => {
           </SheetHeader>
 
           <div>
-            {mockConversations.map((conversation) => (
+            {conversations.map((conversation) => (
               <Conversation key={conversation.id} conversation={conversation} />
             ))}
           </div>
@@ -58,7 +48,7 @@ const ConversationsSideBar = () => {
         <SearchConversation />
       </header>
       <div>
-        {mockConversations.map((conversation) => (
+        {conversations.map((conversation) => (
           <Conversation key={conversation.id} conversation={conversation} />
         ))}
       </div>

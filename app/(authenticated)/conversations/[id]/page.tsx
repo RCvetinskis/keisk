@@ -8,6 +8,8 @@ import {
 } from "@/components/ui/card";
 import Messages from "../_components/messages";
 import WriteMessage from "../_components/write-message";
+import { upsertConversations } from "@/actions/conversation-actions";
+import { conversationMessages } from "@/lib/services/message-service";
 
 type Props = {
   params: Promise<{
@@ -17,6 +19,16 @@ type Props = {
 const Page = async ({ params }: Props) => {
   const { id } = await params;
 
+  if (!id) return <div>Page not found</div>;
+  const conversation = await upsertConversations({ receiverId: Number(id) });
+
+  if (!conversation) return <div>Page not found</div>;
+
+  const messages = await conversationMessages({
+    conversationId: conversation.id,
+  });
+
+  console.log(messages);
   return (
     <Card className="h-[96svh] flex flex-col">
       <CardHeader>
@@ -25,7 +37,7 @@ const Page = async ({ params }: Props) => {
       </CardHeader>
 
       <CardContent className="flex-1 overflow-y-auto">
-        <Messages />
+        <Messages messages={messages} />
       </CardContent>
 
       <CardFooter className="border-t p-4">

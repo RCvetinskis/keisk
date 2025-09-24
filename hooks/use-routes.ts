@@ -3,6 +3,7 @@ import { Home, LucideProps, MessageCircle } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useIsMobile } from "./use-mobile";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
+import { useUser } from "@clerk/nextjs";
 type RouteItem = {
   title: string;
   url: string;
@@ -15,9 +16,11 @@ type RouteItem = {
 const useRoutes = () => {
   const path = usePathname();
   const { toggle } = useSheetStore();
+  const user = useUser();
   const isMobile = useIsMobile();
 
-  const isAuthenticated = true;
+  const isAuthenticated = user.isSignedIn && user.isLoaded;
+
   const authenticatedRoutes = [
     {
       title: "Conversations",

@@ -13,7 +13,6 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { createConversation } from "@/actions/conversation-actions";
 
 type Props = {};
 
@@ -27,7 +26,7 @@ const WriteMessage = (props: Props) => {
 
   const onSubmit = async (values: z.infer<typeof messageSchema>) => {
     console.log(values);
-    await createConversation({ receiverId: 1, content: values.content });
+
     form.reset();
   };
 
