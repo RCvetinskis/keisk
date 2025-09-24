@@ -58,10 +58,14 @@ model Item {
 
   title       String
   description String
+  price       Float
+  imageUrl    String?
 
   userId Int
   user   User @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
+
+  @@unique([id, userId])
 }
