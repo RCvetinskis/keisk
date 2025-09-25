@@ -1,7 +1,7 @@
 "use client";
 import { User } from "@prisma/client";
 import Conversation from "./conersation";
-import SearchConversation from "./search-conversation";
+import SearchInput from "./search-input";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import {
   Sheet,
@@ -26,7 +26,7 @@ const ConversationsSideBar = ({ conversations }: Props) => {
       <Sheet open={isOpen} onOpenChange={(open) => (open ? null : close())}>
         <SheetContent className="p-2 pt-10">
           <SheetHeader className="p-0">
-            <SearchConversation />
+            <SearchInput placeholder="Search conversations..." />
             <VisuallyHidden>
               <SheetTitle>Conversations</SheetTitle>
             </VisuallyHidden>
@@ -45,7 +45,7 @@ const ConversationsSideBar = ({ conversations }: Props) => {
   return (
     <div className="shadow p-2 h-full overflow-x-auto">
       <header className="mb-2">
-        <SearchConversation />
+        <SearchInput placeholder="Search conversations..." />
       </header>
       <div>
         {conversations.map((conversation) => (

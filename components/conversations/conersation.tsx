@@ -40,7 +40,7 @@ const Conversation = ({ conversation }: Props) => {
         )}
       >
         <div className="flex items-center gap-4 ">
-          <UserAvatar />
+          <UserAvatar avatarUrl={otherUser?.avatar} />
 
           <p className="text-sm ">{displayName}</p>
         </div>

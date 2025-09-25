@@ -2,14 +2,16 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
 
-type Props = {};
+type Props = {
+  avatarUrl?: string;
+};
 
-const UserAvatar = (props: Props) => {
+const UserAvatar = ({ avatarUrl }: Props) => {
   const online = true;
   return (
     <div className="relative">
       <Avatar>
-        <AvatarImage src="https://github.com/shadcn.png" />
+        <AvatarImage src={avatarUrl || "https://github.com/shadcn.png"} />
         <AvatarFallback>CN</AvatarFallback>
       </Avatar>
       <Badge
