@@ -37,10 +37,10 @@ export default function RootLayout({
             <AppSidebar />
 
             <SidebarTrigger className="hidden md:block" />
-            <main className="w-full md:max-w-screen md:mx-auto">
+            <main className="w-full pb-24 md:pb-0 md:max-w-screen md:mx-auto">
               {children}
             </main>
-            <footer className="block md:hidden">
+            <footer className="fixed bottom-0 left-0 w-full md:hidden z-50">
               <BottomNavigation />
             </footer>
           </SidebarProvider>

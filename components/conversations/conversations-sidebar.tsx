@@ -1,7 +1,7 @@
 "use client";
-import { Conversation as PrismaConversation } from "@prisma/client";
+import { User } from "@prisma/client";
 import Conversation from "./conersation";
-import SearchConversation from "./search-conversation";
+import SearchInput from "./search-input";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import {
   Sheet,
@@ -11,23 +11,13 @@ import {
 } from "@/components/ui/sheet";
 import useSheetStore from "@/stores/sheet-stores";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { ConversationWithUsers } from "@/lib/types";
 
-export const mockConversations: PrismaConversation[] = [
-  {
-    id: 1,
-    name: "Jonas",
-    createdAt: new Date("2025-08-01T00:00:00.000Z"),
-    updatedAt: new Date("2025-08-02T00:00:00.000Z"),
-  },
-  {
-    id: 2,
-    name: "Alice",
-    createdAt: new Date("2025-09-01T00:00:00.000Z"),
-    updatedAt: new Date("2025-09-02T00:00:00.000Z"),
-  },
-];
+type Props = {
+  conversations: Array<ConversationWithUsers | User>;
+};
 
-const ConversationsSideBar = () => {
+const ConversationsSideBar = ({ conversations }: Props) => {
   const { isOpen, close } = useSheetStore();
   const isMobile = useIsMobile();
 
@@ -36,14 +26,14 @@ const ConversationsSideBar = () => {
       <Sheet open={isOpen} onOpenChange={(open) => (open ? null : close())}>
         <SheetContent className="p-2 pt-10">
           <SheetHeader className="p-0">
-            <SearchConversation />
+            <SearchInput placeholder="Search conversations..." />
             <VisuallyHidden>
               <SheetTitle>Conversations</SheetTitle>
             </VisuallyHidden>
           </SheetHeader>
 
           <div>
-            {mockConversations.map((conversation) => (
+            {conversations.map((conversation) => (
               <Conversation key={conversation.id} conversation={conversation} />
             ))}
           </div>
@@ -55,10 +45,10 @@ const ConversationsSideBar = () => {
   return (
     <div className="shadow p-2 h-full overflow-x-auto">
       <header className="mb-2">
-        <SearchConversation />
+        <SearchInput placeholder="Search conversations..." />
       </header>
       <div>
-        {mockConversations.map((conversation) => (
+        {conversations.map((conversation) => (
           <Conversation key={conversation.id} conversation={conversation} />
         ))}
       </div>
