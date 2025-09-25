@@ -3,11 +3,15 @@ import ItemForm from "../../_components/create-item";
 import { BackButton } from "@/components/navigation/back-button";
 
 type Props = {
-  params: { id: string };
+  params: Promise<{
+    id: string;
+  }>;
 };
-
 export default async function EditItemPage({ params }: Props) {
-  const item = await getItem(Number(params.id));
+  const { id } = await params;
+
+  if (!id) return <div>NO PAG</div>;
+  const item = await getItem(Number(id));
 
   if (!item) {
     return (

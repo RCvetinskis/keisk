@@ -11,6 +11,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { BackButton } from "@/components/navigation/back-button";
 import { ItemDeleteModal } from "../_components/item-delete-modal";
+import Image from "next/image";
 
 type Props = {
   params: { id: string };
@@ -40,7 +41,7 @@ export default async function SingleItemPage({ params }: Props) {
         <CardContent>
           <p className="text-lg font-semibold mb-4">${item.price.toFixed(2)}</p>
           {item.imageUrl && (
-            <img
+            <Image
               src={item.imageUrl}
               alt={item.title}
               className="w-full rounded-lg object-cover"

@@ -14,10 +14,8 @@ export const getItem = async (id: number): Promise<Item | null> => {
 
     return await db.item.findUnique({
       where: {
-        id_userId: {
-          id,
-          userId: currentUser.id,
-        },
+        id,
+        userId: currentUser.id,
       },
     });
   } catch (error) {
@@ -55,10 +53,8 @@ export const deleteItem = async (id: number): Promise<Item | null> => {
 
     return await db.item.delete({
       where: {
-        id_userId: {
-          id,
-          userId: currentUser.id,
-        },
+        id,
+        userId: currentUser.id,
       },
     });
   } catch (error) {
@@ -78,10 +74,8 @@ export const updateItem = async (
 
     return await db.item.update({
       where: {
-        id_userId: {
-          id,
-          userId: currentUser.id,
-        },
+        id,
+        userId: currentUser.id,
       },
       data,
     });
