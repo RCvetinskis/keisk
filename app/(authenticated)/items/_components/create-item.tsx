@@ -22,6 +22,7 @@ const formSchema = z.object({
   description: z.string().min(1, "Description is required"),
   price: z.coerce.number().positive("Price must be positive"),
   imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  categoryId: z.coerce.number().positive("Price must be positive"),
 });
 
 type ItemFormProps = {
@@ -32,6 +33,7 @@ type ItemFormProps = {
     description: string;
     price: number;
     imageUrl?: string | null;
+    categoryId: number;
   };
 };
 
@@ -47,12 +49,14 @@ export default function ItemForm({ mode = "create", item }: ItemFormProps) {
           description: item.description,
           price: item.price,
           imageUrl: item.imageUrl ?? "",
+          categoryId: item.categoryId,
         }
       : {
           title: "",
           description: "",
           price: 0,
           imageUrl: "",
+          categoryId: 1,
         },
   });
 
