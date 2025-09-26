@@ -7,6 +7,7 @@ import { MessageWithUser, ReplyingToType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
 import MessageActions from "./message-actions";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {
   message: MessageWithUser;
@@ -61,3 +62,16 @@ const Message = ({ message, setReplyingTo, level = 0 }: Props) => {
 };
 
 export default Message;
+
+export const MessageSkeleton = () => (
+  <div className="flex flex-col gap-1">
+    <div className="flex items-start gap-2">
+      <Skeleton className="w-8 h-8 rounded-full" />
+      <div className="flex flex-col gap-1">
+        <Skeleton className="w-12 h-3 rounded" />
+        <Skeleton className="w-20 h-2 rounded" />
+        <Skeleton className="w-32 h-6 rounded" />
+      </div>
+    </div>
+  </div>
+);

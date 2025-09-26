@@ -12,6 +12,7 @@ import {
 import useSheetStore from "@/stores/sheet-stores";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ConversationWithUsers } from "@/lib/types";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {
   conversations: Array<ConversationWithUsers | User>;
@@ -57,3 +58,17 @@ const ConversationsSideBar = ({ conversations }: Props) => {
 };
 
 export default ConversationsSideBar;
+
+
+export const ConversationsSidebarSkeleton = () => (
+  <div className="shadow p-2 h-full overflow-x-auto">
+    <header className="mb-2">
+      <Skeleton className="h-8 w-full mb-2" />
+    </header>
+    <div>
+      {[...Array(6)].map((_, i) => (
+        <Skeleton key={i} className="h-12 w-full mb-2" />
+      ))}
+    </div>
+  </div>
+);

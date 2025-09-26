@@ -19,7 +19,7 @@ const BottomNavigation = () => {
             router.push(item.url);
           }}
         >
-          <item.icon />
+          {item.Icon}
         </Button>
       ))}
     </div>
