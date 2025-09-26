@@ -3,6 +3,7 @@ import SearchInput from "@/components/conversations/search-input";
 import { CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ConversationHeader = () => {
   const searchParams = useSearchParams();
@@ -36,3 +37,14 @@ const ConversationHeader = () => {
 };
 
 export default ConversationHeader;
+
+
+export const ConversationHeaderSkeleton = () => (
+  <CardHeader className="border-b flex items-center justify-between">
+    <div className="space-y-2">
+      <Skeleton className="h-6 w-32" />
+      <Skeleton className="h-4 w-24" />
+    </div>
+    <Skeleton className="h-10 w-48" />
+  </CardHeader>
+);

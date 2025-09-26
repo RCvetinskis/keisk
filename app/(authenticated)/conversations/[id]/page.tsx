@@ -1,8 +1,9 @@
 import { Card } from "@/components/ui/card";
-import Messages from "./_components/messages";
+import { MessagesSkeleton } from "./_components/messages";
 import { upsertConversations } from "@/actions/conversation-actions";
 import ConversationHeader from "./_components/conversation-header";
 import { Suspense } from "react";
+import Screen from "./_components/screen";
 
 type Props = {
   params: Promise<{
@@ -24,13 +25,17 @@ const Page = async ({ params, searchParams }: Props) => {
   const { query } = await searchParams;
 
   return (
-    <Card className="h-[96svh] flex flex-col">
-      <Suspense fallback={<div>Loading messages...</div>}>
-        <ConversationHeader />
-        <Messages conversationId={conversation.id} query={query} />
-      </Suspense>
-    </Card>
+    <Suspense fallback={<ConversationPageSkeleton />}>
+      <Screen conversationId={conversation.id} query={query} />
+    </Suspense>
   );
 };
 
 export default Page;
+
+const ConversationPageSkeleton = () => (
+  <Card className="h-[96svh] flex flex-col">
+    <ConversationHeader />
+    <MessagesSkeleton />
+  </Card>
+);

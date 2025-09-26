@@ -1,18 +1,19 @@
 import useSheetStore from "@/stores/sheet-stores";
-import { Home, LucideProps, MessageCircle, List } from "lucide-react";
+import { Home, List } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useIsMobile } from "./use-mobile";
-import { ForwardRefExoticComponent, RefAttributes } from "react";
+import { ReactElement } from "react";
 import { useUser } from "@clerk/nextjs";
+import MessageIcon from "@/components/navigation/message-icon";
+
 type RouteItem = {
   title: string;
   url: string;
-  icon: ForwardRefExoticComponent<
-    Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>
-  >;
+  Icon: ReactElement;
   active: boolean;
   action?: () => void;
 };
+
 const useRoutes = () => {
   const path = usePathname();
   const { toggle } = useSheetStore();
@@ -21,11 +22,11 @@ const useRoutes = () => {
 
   const isAuthenticated = user.isSignedIn && user.isLoaded;
 
-  const authenticatedRoutes = [
+  const authenticatedRoutes: RouteItem[] = [
     {
       title: "Conversations",
       url: "/conversations",
-      icon: MessageCircle,
+      Icon: <MessageIcon />,
       active: path.includes("/conversations"),
       action: () => {
         if (isMobile) {
@@ -36,7 +37,11 @@ const useRoutes = () => {
     {
       title: "Items",
       url: "/items",
-      icon: List,
+      Icon: (
+        <div>
+          <List size={20} />
+        </div>
+      ),
       active: path.includes("/items"),
       action: () => {
         if (isMobile) {
@@ -56,14 +61,20 @@ const useRoutes = () => {
       },
     },
   ];
+
   const routes: RouteItem[] = [
     {
       title: "Home",
       url: "/",
-      icon: Home,
+      Icon: (
+        <div>
+          <Home size={20} />
+        </div>
+      ),
       active: path === "/",
     },
   ];
+
   return isAuthenticated ? [...routes, ...authenticatedRoutes] : routes;
 };
 

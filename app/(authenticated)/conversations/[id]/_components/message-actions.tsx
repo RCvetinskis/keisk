@@ -1,11 +1,14 @@
 import { Button } from "@/components/ui/button";
-import { Copy, Delete, Reply } from "lucide-react";
+import { Copy, Reply, Trash } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { MessageWithUser, ReplyingToType } from "@/lib/types";
+import { toast } from "sonner";
+import { handleDeleteMessage } from "@/actions/message-actions";
+import useMessageStore from "@/stores/message-store";
 
 type Props = {
   children: React.ReactNode;
@@ -14,6 +17,7 @@ type Props = {
 };
 
 const MessageActions = ({ children, message, setReplyingTo }: Props) => {
+  const { removeMessage } = useMessageStore();
   const handleReplying = () => {
     if (setReplyingTo) {
       setReplyingTo({
@@ -23,12 +27,21 @@ const MessageActions = ({ children, message, setReplyingTo }: Props) => {
       });
     }
   };
-// TODO: implement delete message
-// TODO: Implement toast message for copied
-// TODO: Implement notifications for new messages
-// TODO: Implement loading for screens and fix hydration errors
+
+  // TODO: Implement notifications for new messages
   const handleCopy = () => {
+    toast.success("Message copied to clipboard");
     navigator.clipboard.writeText(message.content || "");
+  };
+
+  const handleDelete = async () => {
+    try {
+      await handleDeleteMessage(message.id);
+      removeMessage(message.id);
+      toast.success("Message deleted");
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to delete message");
+    }
   };
   return (
     <Tooltip>
@@ -37,12 +50,13 @@ const MessageActions = ({ children, message, setReplyingTo }: Props) => {
         <Button onClick={handleReplying} variant={"secondary"} size={"icon"}>
           <Reply />
         </Button>
-        <Button variant={"secondary"} size={"icon"}>
-          <Delete />
-        </Button>
 
         <Button onClick={handleCopy} variant={"secondary"} size={"icon"}>
           <Copy />
+        </Button>
+
+        <Button onClick={handleDelete} variant={"secondary"} size={"icon"}>
+          <Trash />
         </Button>
       </TooltipContent>
     </Tooltip>
