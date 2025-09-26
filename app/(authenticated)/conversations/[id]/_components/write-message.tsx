@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/form";
 import useCurrentInternalUser from "@/hooks/use-current-internal-user";
 import { ReplyingToType } from "@/lib/types";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {
   handleMessage: (content: string, senderId: number) => void;
@@ -100,3 +101,12 @@ const WriteMessage = ({ handleMessage, setReplyingTo, replyingTo }: Props) => {
 };
 
 export default WriteMessage;
+
+export const WriteMessageSkeleton = () => (
+  <div className="w-full">
+    <div className="flex items-center gap-2 w-full">
+      <Skeleton className="h-10 w-full rounded" />
+      <Skeleton className="h-10 w-10 rounded" />
+    </div>
+  </div>
+);

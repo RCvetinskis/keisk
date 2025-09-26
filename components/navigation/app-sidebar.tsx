@@ -38,7 +38,8 @@ export function AppSidebar() {
                       }}
                       className="flex items-center gap-2"
                     >
-                      <item.icon />
+                      {item.Icon}
+
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>

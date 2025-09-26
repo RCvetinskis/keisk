@@ -1,18 +1,16 @@
 "use client";
 import { useEffect, useState, useRef, useCallback } from "react";
-import Message from "./message";
-import {
-  MessageWithRelations,
-  MessageWithUser,
-  ReplyingToType,
-} from "@/lib/types";
+import Message, { MessageSkeleton } from "./message";
+import { MessageWithUser, ReplyingToType } from "@/lib/types";
 import { io, Socket } from "socket.io-client";
 import { CardContent, CardFooter } from "@/components/ui/card";
-import WriteMessage from "./write-message";
+import WriteMessage, { WriteMessageSkeleton } from "./write-message";
 import useScrollToBottom from "@/hooks/use-scroll-to-bottom";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import { combineRefs } from "@/hooks/combine-refs";
 import { conversationMessages } from "@/lib/services/message-service";
+import useMessageStore from "@/stores/message-store";
+import Spinner from "@/components/ui/spinner";
 
 type Props = {
   conversationId: number;
@@ -20,7 +18,7 @@ type Props = {
 };
 
 const Messages = ({ conversationId, query }: Props) => {
-  const [messages, setMessages] = useState<MessageWithRelations[]>([]);
+  const { messages, setMessages, addNewMessage } = useMessageStore();
   const [page, setPage] = useState(1);
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -34,7 +32,7 @@ const Messages = ({ conversationId, query }: Props) => {
     });
 
     socketRef.current.on("message", (msg: MessageWithUser) => {
-      setMessages((prev) => [...prev, msg]);
+      addNewMessage(msg);
     });
 
     return () => {
@@ -75,7 +73,7 @@ const Messages = ({ conversationId, query }: Props) => {
         setLoading(false);
       }
     },
-    [conversationId, query, loading]
+    [conversationId, query]
   );
 
   useEffect(() => {
@@ -100,17 +98,11 @@ const Messages = ({ conversationId, query }: Props) => {
         className="flex-1 overflow-y-scroll h-full flex flex-col gap-2"
       >
         {loading ? (
-          <div>Loading...</div>
+          <Spinner />
         ) : (
-          <>
-            {messages.map((msg) => (
-              <Message
-                setReplyingTo={setReplyingTo}
-                key={msg.id}
-                message={msg}
-              />
-            ))}
-          </>
+          messages.map((msg) => (
+            <Message setReplyingTo={setReplyingTo} key={msg.id} message={msg} />
+          ))
         )}
       </CardContent>
 
@@ -126,3 +118,16 @@ const Messages = ({ conversationId, query }: Props) => {
 };
 
 export default Messages;
+
+export const MessagesSkeleton = () => (
+  <>
+    <CardContent className="flex-1 overflow-y-scroll h-full flex flex-col gap-2">
+      {[...Array(10)].map((_, index) => (
+        <MessageSkeleton key={index} />
+      ))}
+    </CardContent>
+    <CardFooter className="border-t p-4">
+      <WriteMessageSkeleton />
+    </CardFooter>
+  </>
+);
