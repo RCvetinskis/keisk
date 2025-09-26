@@ -34,6 +34,7 @@ export const createItem = async (
     return await db.item.create({
       data: {
         ...data,
+        categoryId: 1,
         userId: currentUser.id,
       },
     });
@@ -75,6 +76,7 @@ export const updateItem = async (
     return await db.item.update({
       where: {
         id,
+        categoryId: 1,
         userId: currentUser.id,
       },
       data,
