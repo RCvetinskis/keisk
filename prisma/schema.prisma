@@ -18,6 +18,7 @@ model User {
   updatedAt      DateTime      @default(now())
   items          Item[]
   messages       Message[]
+  notifications  Notification[]
   conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   @@index([conversationId], map: "User_conversationId_fkey")
@@ -45,10 +46,38 @@ model Message {
   parent         Message?     @relation("MessageReplies", fields: [parentId], references: [id])
   replies        Message[]    @relation("MessageReplies")
   user           User         @relation(fields: [userId], references: [id])
+  Notification Notification[]
 
   @@index([conversationId], map: "Message_conversationId_fkey")
   @@index([parentId], map: "Message_parentId_fkey")
   @@index([userId], map: "Message_userId_fkey")
+}
+
+enum NotificationType {
+  general_notification
+  new_message
+}
+
+model Notification {
+  id   Int              @id @default(autoincrement())
+  type NotificationType @default(general_notification)
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  messageId Int?
+  message   Message? @relation(fields: [messageId], references: [id])
+
+  content String
+
+  isRead Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+  @@index([userId, type, isRead])
 }
 
 model Item {
