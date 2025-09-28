@@ -58,14 +58,29 @@ model Item {
 
   title       String
   description String
-  price       Float
   imageUrl    String?
 
   userId Int
   user   User @relation(fields: [userId], references: [id])
 
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
+}
 
-  @@unique([id, userId])
+model Category {
+  id          Int     @id @default(autoincrement())
+  title       String
+  description String?
+
+  parentId Int?
+  parent   Category?  @relation("CategoryToSubcategories", fields: [parentId], references: [id], onDelete: Cascade)
+  children Category[] @relation("CategoryToSubcategories")
+
+  items Item[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 }

@@ -44,6 +44,17 @@ const useRoutes = () => {
         }
       },
     },
+    {
+      title: "Categories",
+      url: "/categories",
+      icon: List,
+      active: path.includes("/categories"),
+      action: () => {
+        if (isMobile) {
+          toggle();
+        }
+      },
+    },
   ];
   const routes: RouteItem[] = [
     {

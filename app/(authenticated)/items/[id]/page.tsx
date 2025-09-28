@@ -39,7 +39,6 @@ export default async function SingleItemPage({ params }: Props) {
           <CardDescription>{item.description}</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-lg font-semibold mb-4">${item.price.toFixed(2)}</p>
           {item.imageUrl && (
             <Image
               src={item.imageUrl}

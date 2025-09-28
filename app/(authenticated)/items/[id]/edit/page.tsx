@@ -1,6 +1,7 @@
 import { getItem } from "@/actions/item-actions";
 import ItemForm from "../../_components/create-item";
 import { BackButton } from "@/components/navigation/back-button";
+import { getStructuredCategories } from "@/actions/category-actions";
 
 type Props = {
   params: Promise<{
@@ -9,8 +10,8 @@ type Props = {
 };
 export default async function EditItemPage({ params }: Props) {
   const { id } = await params;
-
-  if (!id) return <div>NO PAG</div>;
+  const categories = await getStructuredCategories();
+  if (!id || !categories) return <div>NO PAG</div>;
   const item = await getItem(Number(id));
 
   if (!item) {
@@ -32,7 +33,7 @@ export default async function EditItemPage({ params }: Props) {
       </div>
 
       <div className="bg-white dark:bg-neutral-900 shadow-md rounded-xl p-6">
-        <ItemForm mode="edit" item={item} />
+        <ItemForm mode="edit" item={item} categories={categories} />
       </div>
     </div>
   );
