@@ -6,7 +6,6 @@ import db from "@/lib/db";
 import { getCurrentInternalUser } from "@/lib/services/user-services";
 import { redirect } from "next/navigation";
 
-// usage: await getItem(123)
 export const getItem = async (id: number): Promise<Item | null> => {
   try {
     const currentUser = await getCurrentInternalUser();
@@ -34,7 +33,6 @@ export const createItem = async (
     return await db.item.create({
       data: {
         ...data,
-        categoryId: 1,
         userId: currentUser.id,
       },
     });
@@ -46,7 +44,6 @@ export const createItem = async (
   }
 };
 
-// usage: await deleteItem(123)
 export const deleteItem = async (id: number): Promise<Item | null> => {
   try {
     const currentUser = await getCurrentInternalUser();
@@ -64,7 +61,6 @@ export const deleteItem = async (id: number): Promise<Item | null> => {
   }
 };
 
-// usage: await updateItem(123, { title: "New Title" })
 export const updateItem = async (
   id: number,
   data: Prisma.ItemUpdateInput
@@ -104,12 +100,11 @@ export const getAllUsersItems = async (): Promise<Item[]> => {
   }
 };
 
-// usage: await getAllItems()
 export const getAllItems = async (): Promise<Item[]> => {
   try {
     return await db.item.findMany({
       include: {
-        user: true, // if you want to show the owner info
+        user: true,
       },
       orderBy: { createdAt: "desc" },
     });

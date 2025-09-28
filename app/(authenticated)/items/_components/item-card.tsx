@@ -4,7 +4,6 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-  CardContent,
   CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,17 +14,10 @@ type ItemCardProps = {
   id: number;
   title: string;
   description: string;
-  price: number;
   imageUrl?: string | null;
 };
 
-export function ItemCard({
-  id,
-  title,
-  description,
-  price,
-  imageUrl,
-}: ItemCardProps) {
+export function ItemCard({ id, title, description, imageUrl }: ItemCardProps) {
   return (
     <Card className="overflow-hidden transition hover:shadow-lg">
       {imageUrl && (
@@ -39,9 +31,6 @@ export function ItemCard({
           {description}
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <p className="text-lg font-semibold">${price.toFixed(2)}</p>
-      </CardContent>
       <CardFooter>
         <CardFooter className="flex gap-2">
           <Button variant="secondary" asChild>

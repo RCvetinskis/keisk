@@ -58,7 +58,6 @@ model Item {
 
   title       String
   description String
-  price       Float
   imageUrl    String?
 
   userId Int
