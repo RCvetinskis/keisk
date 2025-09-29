@@ -7,16 +7,16 @@ const io = new Server(httpServer, {
   cors: { origin: "*" },
 });
 
+const activeUsers = new Map<
+  number,
+  { socketId: string; conversationId?: number }
+>();
 
-const activeUsers = new Map<number, { socketId: string; conversationId?: number }>();
-// TODO: Add online/offline status for users, if user online and jonied send notifications
 io.on("connection", (socket) => {
-  const userId = Number(socket.handshake.query.userId);
+  const userId = socket.handshake.auth.userId;
   console.log("User connected:", userId);
 
-
   activeUsers.set(userId, { socketId: socket.id });
-
 
   socket.on("joinConversation", (conversationId: number) => {
     const user = activeUsers.get(userId);
@@ -24,9 +24,7 @@ io.on("connection", (socket) => {
     console.log(`User ${userId} joined conversation ${conversationId}`);
   });
 
-
   socket.on("message", (msg) => {
-
     const result = {
       ...msg,
       activeUsers: Array.from(activeUsers.keys()),

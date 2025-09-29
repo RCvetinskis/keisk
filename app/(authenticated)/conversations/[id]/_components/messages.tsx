@@ -12,15 +12,14 @@ import { conversationMessages } from "@/lib/services/message-service";
 import useMessageStore from "@/stores/message-store";
 import Spinner from "@/components/ui/spinner";
 import { createMessage } from "@/actions/message-actions";
-import { useUser } from "@clerk/nextjs";
 
 type Props = {
   conversationId: number;
+  currentUserId: number;
   query?: string;
 };
 
-const Messages = ({ conversationId, query }: Props) => {
-  const { user } = useUser();
+const Messages = ({ conversationId, currentUserId, query }: Props) => {
   const { messages, setMessages, addNewMessage } = useMessageStore();
   const [page, setPage] = useState(1);
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
@@ -29,30 +28,26 @@ const Messages = ({ conversationId, query }: Props) => {
 
   const socketRef = useRef<Socket | null>(null);
 
-  const saveMessage = async (msg: MessageWithUser) => {
+  const saveMessage = async (msg: any) => {
     const message = await createMessage({
       conversationId: msg.conversationId,
       content: msg.content || "",
-      // Only send notification if receiver is not in the conversation
-      sendNotification: !msg.activeUsers?.includes(msg.receiverId),
+      sendNotification: msg.activeUsers.length > 2, // send notification only if 1 more user is not active
     });
     return message as MessageWithUser;
   };
 
   useEffect(() => {
-    if (!user) return;
-
     // Connect socket with userId
     socketRef.current = io(process.env.NEXT_PUBLIC_SOCKET_IO_URL!, {
       transports: ["websocket"],
-      query: { userId: user.id },
+      auth: { userId: currentUserId },
     });
 
     // Join current conversation room
     socketRef.current.emit("joinConversation", conversationId);
 
-    socketRef.current.on("message", async (msg: MessageWithUser & { activeUsers?: string[] }) => {
-      // Save message in DB and trigger notification if needed
+    socketRef.current.on("message", async (msg: any) => {
       const message = await saveMessage(msg);
       if (message) {
         addNewMessage(message);
@@ -62,7 +57,7 @@ const Messages = ({ conversationId, query }: Props) => {
     return () => {
       socketRef.current?.disconnect();
     };
-  }, [user, conversationId]);
+  }, [conversationId]);
 
   const { scrollRef } = useScrollToBottom({ changes: messages });
 
@@ -80,7 +75,11 @@ const Messages = ({ conversationId, query }: Props) => {
       if (loading) return;
       setLoading(true);
       try {
-        const result = await conversationMessages({ conversationId, page: pageToLoad, query });
+        const result = await conversationMessages({
+          conversationId,
+          page: pageToLoad,
+          query,
+        });
         setMessages((prev) =>
           pageToLoad === 1 ? result.messages : [...result.messages, ...prev]
         );
@@ -110,7 +109,10 @@ const Messages = ({ conversationId, query }: Props) => {
 
   return (
     <>
-      <CardContent ref={combinedRef} className="flex-1 overflow-y-scroll h-full flex flex-col gap-2">
+      <CardContent
+        ref={combinedRef}
+        className="flex-1 overflow-y-scroll h-full flex flex-col gap-2"
+      >
         {loading ? (
           <Spinner />
         ) : (
@@ -121,7 +123,11 @@ const Messages = ({ conversationId, query }: Props) => {
       </CardContent>
 
       <CardFooter className="border-t p-4">
-        <WriteMessage handleMessage={sendMessage} setReplyingTo={setReplyingTo} replyingTo={replyingTo} />
+        <WriteMessage
+          handleMessage={sendMessage}
+          setReplyingTo={setReplyingTo}
+          replyingTo={replyingTo}
+        />
       </CardFooter>
     </>
   );

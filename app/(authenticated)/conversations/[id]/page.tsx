@@ -4,6 +4,7 @@ import { upsertConversations } from "@/actions/conversation-actions";
 import ConversationHeader from "./_components/conversation-header";
 import { Suspense } from "react";
 import Screen from "./_components/screen";
+import { getCurrentInternalUser } from "@/lib/services/user-services";
 
 type Props = {
   params: Promise<{
@@ -17,16 +18,16 @@ const Page = async ({ params, searchParams }: Props) => {
   const { id } = await params;
 
   if (!id) return <div>Page not found</div>;
-
+  const currentUser = await getCurrentInternalUser();
   const conversation = await upsertConversations({ receiverId: Number(id) });
 
-  if (!conversation) return <div>Page not found</div>;
+  if (!conversation || !currentUser) return <div>Page not found</div>;
 
   const { query } = await searchParams;
 
   return (
     <Suspense fallback={<ConversationPageSkeleton />}>
-      <Screen conversationId={conversation.id} query={query} />
+      <Screen conversationId={conversation.id} query={query} currentUserId={currentUser.id} />
     </Suspense>
   );
 };
