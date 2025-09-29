@@ -52,7 +52,11 @@ const useRoutes = () => {
     {
       title: "Categories",
       url: "/categories",
-      icon: List,
+      Icon: (
+        <div>
+          <List size={20} />
+        </div>
+      ),
       active: path.includes("/categories"),
       action: () => {
         if (isMobile) {

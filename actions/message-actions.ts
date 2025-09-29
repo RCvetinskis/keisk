@@ -7,9 +7,11 @@ import { revalidatePath } from "next/cache";
 export const createMessage = async ({
   conversationId,
   content,
+  sendNotification = true,
 }: {
   conversationId: number;
   content: string;
+  sendNotification?: boolean;
 }) => {
   try {
     const currentUser = await getCurrentInternalUser();
@@ -18,8 +20,15 @@ export const createMessage = async ({
     const conversation = await db.conversation.findFirst({
       where: {
         id: conversationId,
-        users: {
-          some: { id: currentUser.id },
+        userConversations: {
+          some: {
+            userId: currentUser.id,
+          },
+        },
+      },
+      include: {
+        userConversations: {
+          include: { user: true },
         },
       },
     });
@@ -29,10 +38,31 @@ export const createMessage = async ({
     const message = await db.message.create({
       data: {
         content: content,
-        conversationId: conversation.id,
+        conversationId: conversationId,
         userId: currentUser.id,
       },
+      include: { user: true, conversation: true },
     });
+
+    if (sendNotification) {
+      const receiver = conversation.userConversations.find(
+        (uc) => uc.user.id !== currentUser.id
+      )?.user;
+
+      if (receiver) {
+        await db.notification.create({
+          data: {
+            userId: receiver.id,
+            type: "new_message",
+            content: `New message from ${currentUser.username}: ${content}`,
+            messageId: message.id,
+          },
+        });
+
+        revalidatePath(`/conversations/${conversation.id}`);
+        return message;
+      }
+    }
 
     revalidatePath(`/conversations/${conversation.id}`);
     return message;

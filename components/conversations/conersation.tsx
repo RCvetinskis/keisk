@@ -7,29 +7,30 @@ import { cn } from "@/lib/utils";
 import { ConversationWithUsers } from "@/lib/types";
 import { useUser } from "@clerk/nextjs";
 import { formatTimeAgo } from "@/lib/helpers/time-helpers";
+import { useMemo, memo } from "react";
 
 type Props = {
-  conversation: ConversationWithUsers | User;
+  conversation: ConversationWithUsers;
 };
 
 const Conversation = ({ conversation }: Props) => {
   const params = useParams();
   const { user } = useUser();
 
-  const otherUser =
-    "messages" in conversation
-      ? conversation.users.find(
-          (conversationUser) => conversationUser.externalId !== user?.id
-        )
-      : conversation;
+  const otherUser = useMemo(
+    () =>
+      conversation.userConversations.find(
+        (cu) => cu.user.externalId !== user?.id
+      )?.user,
+    [conversation.userConversations, user?.id]
+  );
 
   const displayName = otherUser ? otherUser.username : "N/A";
-
-  const lastMessage =
-    "messages" in conversation && conversation.messages.length > 0
-      ? conversation.messages[0]
-      : null;
-
+  console.log("render");
+  const lastMessage = useMemo(
+    () => (conversation.messages.length > 0 ? conversation.messages[0] : null),
+    [conversation.messages]
+  );
   const seleceted = Number(params.id) || 1;
   return (
     <Link href={`/conversations/${otherUser?.id}`}>
@@ -60,4 +61,4 @@ const Conversation = ({ conversation }: Props) => {
   );
 };
 
-export default Conversation;
+export default memo(Conversation);
