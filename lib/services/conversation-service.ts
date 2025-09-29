@@ -15,20 +15,28 @@ export const userConversations = async ({
 
   const conversations = await db.conversation.findMany({
     where: {
-      users: {
-        some: { id: currentUser.id },
+      userConversations: {
+        some: { userId: currentUser.id },
       },
       ...(query
         ? {
             OR: [
               { name: { contains: query } },
-              { users: { some: { username: { contains: query } } } },
+              {
+                userConversations: {
+                  some: { user: { username: { contains: query } } },
+                },
+              },
             ],
           }
         : {}),
     },
     include: {
-      users: true,
+      userConversations: {
+        include: {
+          user: true,
+        },
+      },
       messages: {
         orderBy: { createdAt: "desc" },
         take: 1,

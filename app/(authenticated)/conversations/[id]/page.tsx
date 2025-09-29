@@ -1,8 +1,10 @@
 import { Card } from "@/components/ui/card";
-import Messages from "./_components/messages";
+import { MessagesSkeleton } from "./_components/messages";
 import { upsertConversations } from "@/actions/conversation-actions";
 import ConversationHeader from "./_components/conversation-header";
 import { Suspense } from "react";
+import Screen from "./_components/screen";
+import { getCurrentInternalUser } from "@/lib/services/user-services";
 
 type Props = {
   params: Promise<{
@@ -16,21 +18,25 @@ const Page = async ({ params, searchParams }: Props) => {
   const { id } = await params;
 
   if (!id) return <div>Page not found</div>;
-
+  const currentUser = await getCurrentInternalUser();
   const conversation = await upsertConversations({ receiverId: Number(id) });
 
-  if (!conversation) return <div>Page not found</div>;
+  if (!conversation || !currentUser) return <div>Page not found</div>;
 
   const { query } = await searchParams;
 
   return (
-    <Card className="h-[96svh] flex flex-col">
-      <Suspense fallback={<div>Loading messages...</div>}>
-        <ConversationHeader />
-        <Messages conversationId={conversation.id} query={query} />
-      </Suspense>
-    </Card>
+    <Suspense fallback={<ConversationPageSkeleton />}>
+      <Screen conversationId={conversation.id} query={query} currentUserId={currentUser.id} />
+    </Suspense>
   );
 };
 
 export default Page;
+
+const ConversationPageSkeleton = () => (
+  <Card className="h-[96svh] flex flex-col">
+    <ConversationHeader />
+    <MessagesSkeleton />
+  </Card>
+);

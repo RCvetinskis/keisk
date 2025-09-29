@@ -4,33 +4,37 @@ import db from "./lib/db";
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
-  cors: {
-    origin: "*",
-  },
+  cors: { origin: "*" },
 });
 
-io.on("connection", (socket) => {
-  console.log("New client connected:", socket.id);
-  socket.on("message", async (msg) => {
-    try {
-      const message = await db.message.create({
-        data: {
-          content: msg.content,
-          conversationId: msg.conversationId,
-          userId: msg.senderId,
-          parentId: msg.parentId || null,
-        },
-        include: { user: true },
-      });
+const activeUsers = new Map<
+  number,
+  { socketId: string; conversationId?: number }
+>();
 
-      io.emit("message", message);
-    } catch (err) {
-      console.error("Error saving message:", err);
-    }
+io.on("connection", (socket) => {
+  const userId = socket.handshake.auth.userId;
+  console.log("User connected:", userId);
+
+  activeUsers.set(userId, { socketId: socket.id });
+
+  socket.on("joinConversation", (conversationId: number) => {
+    const user = activeUsers.get(userId);
+    if (user) user.conversationId = conversationId;
+    console.log(`User ${userId} joined conversation ${conversationId}`);
+  });
+
+  socket.on("message", (msg) => {
+    const result = {
+      ...msg,
+      activeUsers: Array.from(activeUsers.keys()),
+    };
+    io.emit("message", result);
   });
 
   socket.on("disconnect", () => {
-    console.log("Client disconnected:", socket.id);
+    activeUsers.delete(userId);
+    console.log("User disconnected:", userId);
   });
 });
 

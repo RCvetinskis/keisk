@@ -8,79 +8,111 @@ datasource db {
 }
 
 model User {
-  id         Int    @id @default(autoincrement())
-  externalId String @unique
-  email      String @unique
-  username   String
-  avatar     String
-
-  conversationId Int?
-  conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  messages       Message[]
-  items          Item[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id            Int           @id @default(autoincrement())
+  externalId    String        @unique
+  email         String        @unique
+  username      String
+  avatar        String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @default(now())
+  items         Item[]
+  messages      Message[]
+  notifications Notification[]
+  userConversations UserConversation[]
 }
 
 model Conversation {
-  id   Int     @id @default(autoincrement())
-  name String?
+  id        Int       @id @default(autoincrement())
+  name      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
+  messages  Message[]
+  userConversations UserConversation[]
+}
 
-  messages Message[]
-  users    User[]
+model UserConversation {
+  id            Int @id @default(autoincrement())
+  userId        Int
+  conversationId Int
+  user          User        @relation(fields: [userId], references: [id])
+  conversation  Conversation @relation(fields: [conversationId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  @@unique([userId, conversationId])
 }
 
 model Message {
-  id      Int     @id @default(autoincrement())
-  content String?
-  file    String?
-
+  id             Int            @id @default(autoincrement())
+  content        String?
+  file           String?
   conversationId Int
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId         Int
+  parentId       Int?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @default(now())
+  conversation   Conversation   @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  parent         Message?       @relation("MessageReplies", fields: [parentId], references: [id])
+  replies        Message[]      @relation("MessageReplies")
+  user           User           @relation(fields: [userId], references: [id])
+  Notification   Notification[]
+
+  @@index([conversationId], map: "Message_conversationId_fkey")
+  @@index([parentId], map: "Message_parentId_fkey")
+  @@index([userId], map: "Message_userId_fkey")
+}
+
+enum NotificationType {
+  general_notification
+  new_message
+}
+
+model Notification {
+  id   Int              @id @default(autoincrement())
+  type NotificationType @default(general_notification)
 
   userId Int
   user   User @relation(fields: [userId], references: [id])
 
-  parentId Int?
-  parent   Message?  @relation("MessageReplies", fields: [parentId], references: [id])
-  replies  Message[] @relation("MessageReplies")
+  messageId Int?
+  message   Message? @relation(fields: [messageId], references: [id])
+
+  content String
+
+  isRead Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+  @@index([userId, type, isRead])
 }
 
 model Item {
-  id Int @id @default(autoincrement())
-
+  id          Int      @id @default(autoincrement())
   title       String
   description String
+  userId      Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
   imageUrl    String?
+  categoryId  Int
+  Category    Category @relation(fields: [categoryId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
 
-  userId Int
-  user   User @relation(fields: [userId], references: [id])
-
-  categoryId Int
-  category   Category @relation(fields: [categoryId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  @@index([categoryId], map: "Item_categoryId_fkey")
+  @@index([userId], map: "Item_userId_fkey")
 }
 
 model Category {
-  id          Int     @id @default(autoincrement())
-  title       String
-  description String?
+  id             Int        @id @default(autoincrement())
+  title          String
+  parentId       Int?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @default(now())
+  description    String?
+  Category       Category?  @relation("CategoryToCategory", fields: [parentId], references: [id], onDelete: Cascade)
+  other_Category Category[] @relation("CategoryToCategory")
+  Item           Item[]
 
-  parentId Int?
-  parent   Category?  @relation("CategoryToSubcategories", fields: [parentId], references: [id], onDelete: Cascade)
-  children Category[] @relation("CategoryToSubcategories")
-
-  items Item[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  @@index([parentId], map: "Category_parentId_fkey")
 }

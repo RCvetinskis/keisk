@@ -1,26 +1,26 @@
 "use client";
 import { useEffect, useState, useRef, useCallback } from "react";
-import Message from "./message";
-import {
-  MessageWithRelations,
-  MessageWithUser,
-  ReplyingToType,
-} from "@/lib/types";
+import Message, { MessageSkeleton } from "./message";
+import { MessageWithUser, ReplyingToType } from "@/lib/types";
 import { io, Socket } from "socket.io-client";
 import { CardContent, CardFooter } from "@/components/ui/card";
-import WriteMessage from "./write-message";
+import WriteMessage, { WriteMessageSkeleton } from "./write-message";
 import useScrollToBottom from "@/hooks/use-scroll-to-bottom";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import { combineRefs } from "@/hooks/combine-refs";
 import { conversationMessages } from "@/lib/services/message-service";
+import useMessageStore from "@/stores/message-store";
+import Spinner from "@/components/ui/spinner";
+import { createMessage } from "@/actions/message-actions";
 
 type Props = {
   conversationId: number;
+  currentUserId: number;
   query?: string;
 };
 
-const Messages = ({ conversationId, query }: Props) => {
-  const [messages, setMessages] = useState<MessageWithRelations[]>([]);
+const Messages = ({ conversationId, currentUserId, query }: Props) => {
+  const { messages, setMessages, addNewMessage } = useMessageStore();
   const [page, setPage] = useState(1);
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -28,19 +28,36 @@ const Messages = ({ conversationId, query }: Props) => {
 
   const socketRef = useRef<Socket | null>(null);
 
+  const saveMessage = async (msg: any) => {
+    const message = await createMessage({
+      conversationId: msg.conversationId,
+      content: msg.content || "",
+      sendNotification: msg.activeUsers.length > 2, // send notification only if 1 more user is not active
+    });
+    return message as MessageWithUser;
+  };
+
   useEffect(() => {
+    // Connect socket with userId
     socketRef.current = io(process.env.NEXT_PUBLIC_SOCKET_IO_URL!, {
       transports: ["websocket"],
+      auth: { userId: currentUserId },
     });
 
-    socketRef.current.on("message", (msg: MessageWithUser) => {
-      setMessages((prev) => [...prev, msg]);
+    // Join current conversation room
+    socketRef.current.emit("joinConversation", conversationId);
+
+    socketRef.current.on("message", async (msg: any) => {
+      const message = await saveMessage(msg);
+      if (message) {
+        addNewMessage(message);
+      }
     });
 
     return () => {
       socketRef.current?.disconnect();
     };
-  }, []);
+  }, [conversationId]);
 
   const { scrollRef } = useScrollToBottom({ changes: messages });
 
@@ -56,7 +73,6 @@ const Messages = ({ conversationId, query }: Props) => {
   const fetchMessages = useCallback(
     async (pageToLoad: number) => {
       if (loading) return;
-
       setLoading(true);
       try {
         const result = await conversationMessages({
@@ -64,18 +80,16 @@ const Messages = ({ conversationId, query }: Props) => {
           page: pageToLoad,
           query,
         });
-
         setMessages((prev) =>
           pageToLoad === 1 ? result.messages : [...result.messages, ...prev]
         );
-
         setHasMoreMessages(result.hasMore);
         setPage(pageToLoad);
       } finally {
         setLoading(false);
       }
     },
-    [conversationId, query, loading]
+    [conversationId, query, loading, setMessages]
   );
 
   useEffect(() => {
@@ -100,17 +114,11 @@ const Messages = ({ conversationId, query }: Props) => {
         className="flex-1 overflow-y-scroll h-full flex flex-col gap-2"
       >
         {loading ? (
-          <div>Loading...</div>
+          <Spinner />
         ) : (
-          <>
-            {messages.map((msg) => (
-              <Message
-                setReplyingTo={setReplyingTo}
-                key={msg.id}
-                message={msg}
-              />
-            ))}
-          </>
+          messages.map((msg) => (
+            <Message setReplyingTo={setReplyingTo} key={msg.id} message={msg} />
+          ))
         )}
       </CardContent>
 
@@ -126,3 +134,16 @@ const Messages = ({ conversationId, query }: Props) => {
 };
 
 export default Messages;
+
+export const MessagesSkeleton = () => (
+  <>
+    <CardContent className="flex-1 overflow-y-scroll h-full flex flex-col gap-2">
+      {[...Array(10)].map((_, index) => (
+        <MessageSkeleton key={index} />
+      ))}
+    </CardContent>
+    <CardFooter className="border-t p-4">
+      <WriteMessageSkeleton />
+    </CardFooter>
+  </>
+);

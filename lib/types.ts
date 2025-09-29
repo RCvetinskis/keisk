@@ -16,10 +16,11 @@ export type MessageWithRelations = MessageWithUser & {
 };
 
 export type ConversationWithUsers = PrismaConversation & {
-  users: User[];
+  userConversations: {
+    user: User;
+  }[];
   messages: MessageWithUser[];
 };
-
 export type ReplyingToType = {
   messageId: number;
   content: string;
