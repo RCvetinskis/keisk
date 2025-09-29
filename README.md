@@ -14,6 +14,8 @@ pnpm dev
 bun dev
 ```
 
+## Running subdomain locally for clerk:
+`npx localtunnel --port 3000 --subdomain keisk`
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
